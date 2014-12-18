@@ -1,20 +1,11 @@
-require "thread"
-require "httpclient"
 require 'server'
+require 'worker'
 
 queue = Queue.new
-client = HTTPClient.new
 server = Server.new
 
 10.times do
-  Thread.new do
-    while data = queue.pop
-      client.post("https://android.googleapis.com/gcm/send", data, {
-                                                             "Authorization" => "key=AIzaSyCABSTd47XeIH",
-                                                             "Content-Type" => "application/json"
-                                                           })
-    end
-  end
+  Worker.new.start(queue)
 end
 
 server.start(queue)
