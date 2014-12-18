@@ -1,11 +1,23 @@
 require 'server'
 require 'worker'
 
-queue = Queue.new
-server = Server.new
+class PushDaemon
 
-10.times do
-  Worker.new.start(queue)
+  def initialize
+    @queue = Queue.new
+    @server = Server.new
+  end
+
+  def start
+    start_workers
+    start_local_server
+  end
+
+  def start_local_server
+    @server.start(@queue)
+  end
+
+  def start_workers
+    10.times { Worker.new.start(@queue) }
+  end
 end
-
-server.start(queue)
